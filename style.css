@@ -149,3 +149,6 @@ dialog[open]::backdrop{animation:backdrop-enter .25s ease-out}
 .theme-releve{--case-accent:#ff8059}.mockup-releve{background:#252a20!important}.releve-media figure{margin:32px 0 0}.releve-media video{display:block;width:100%;aspect-ratio:16/9;background:#252a20;border-radius:18px}.releve-media figcaption{padding-top:14px}.releve-media h3{font-size:20px;font-weight:500;margin:0 0 8px}.releve-media figcaption p{color:var(--muted);font-size:16px;line-height:1.6;margin:0}
 
 .neotravel-intro-video{margin:0 6% 60px;padding-top:0}
+
+/* Titres et sections reçoivent le focus par script (accessibilité) : pas de contour visible */
+[tabindex="-1"]:focus{outline:none}
