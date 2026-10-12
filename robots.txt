@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://paul-balcon-design.poulepaul.chatgpt.site/sitemap.xml
