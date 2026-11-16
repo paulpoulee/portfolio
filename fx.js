@@ -72,12 +72,14 @@
     });
     scope.querySelectorAll('.projects .project-visual').forEach(el => register(el, 'card', { max: 12 }));
     scope.querySelectorAll('.collaboration-card').forEach((el, i) => register(el, 'side', { dir: i % 2 ? 1 : -1, max: 6 }));
-    scope.querySelectorAll('.approach>div,.timeline article,.education>div,.project-role article,.focus-list article,.axis-grid article,.deliverables>div,.project-facts>div').forEach((el, i, all) => {
+    scope.querySelectorAll('.approach>div,.education>div,.project-role article,.focus-list article,.axis-grid article,.deliverables>div,.project-facts>div').forEach((el, i, all) => {
       const siblings = [...el.parentElement.children];
       register(el, 'depth', { stagger: siblings.indexOf(el) % 4 });
     });
     scope.querySelectorAll('.resume-card,.certificate-featured,.epitech-collection,.case-quote').forEach(el => register(el, 'depth', { stagger: 0, tilt: false }));
     scope.querySelectorAll('.resume-thumb,.certificate-featured .certificate-thumb').forEach(el => register(el, 'tilt', { tilt: true, max: 14 }));
+    if (!home.hidden) { setupGallery(); setupTimeline(); magnetize(home.querySelector('.contact h2')); }
+    layoutGallery();
     const cover = scope.querySelector('.case-cover');
     if (cover && !entering) register(cover, 'cover');
     const next = scope.querySelector('.next-project h2');
@@ -133,13 +135,20 @@
     const skew = clamp(vel * .05, -3, 3);
     for (const it of items) {
       const r = it.el.getBoundingClientRect();
-      if (r.bottom < -200 || r.top > vh + 200) continue;
+      if (r.bottom < -200 || r.top > vh + 200 || (it.kind !== 'card' && (r.right < -200 || r.left > innerWidth + 200))) continue;
       const target = clamp((vh - r.top) / (vh * .8));
       it.e = lerp(it.e, target, k * .9);
       it.rx = lerp(it.rx, it.hover ? it.trx : 0, k * .7);
       it.ry = lerp(it.ry, it.hover ? it.try : 0, k * .7);
       const e = ease(clamp(it.e));
-      if (it.kind === 'card') {
+      if (it.kind === 'card' && gallery && root.classList.contains('fx-h')) {
+        const pr = it.el.parentElement.getBoundingClientRect();
+        const cx = (pr.left + pr.width / 2 - innerWidth / 2) / innerWidth;
+        const lift = it.hover ? 30 : 0;
+        it.el.style.transform = `perspective(1400px) translate3d(0,0,${(-Math.abs(cx) * 320 + lift).toFixed(1)}px) rotateY(${(-cx * 34 + it.ry).toFixed(2)}deg) rotateX(${it.rx.toFixed(2)}deg) skewX(${clamp(-vel * .08, -6, 6).toFixed(2)}deg)`;
+        it.el.style.opacity = clamp(1.25 - Math.abs(cx) * 1.1, .2, 1).toFixed(3);
+        if (it.img) { it.img.style.translate = `${(cx * -70 - it.ry * 1.4).toFixed(1)}px ${(it.rx * 1.4).toFixed(1)}px`; it.img.style.scale = '1.14'; }
+      } else if (it.kind === 'card') {
         const lift = it.hover ? 30 : 0;
         it.el.style.transform = `perspective(1400px) translate3d(0,${((1 - e) * 110).toFixed(1)}px,${(-(1 - e) * 220 + lift).toFixed(1)}px) rotateX(${((1 - e) * 26 + it.rx).toFixed(2)}deg) rotateY(${it.ry.toFixed(2)}deg) skewY(${skew.toFixed(2)}deg)`;
         it.el.style.opacity = (0.15 + e * .85).toFixed(3);
@@ -193,20 +202,6 @@
       helix() { const a = new Float32Array(N * 4); for (let i = 0; i < N; i++) { const t = i / N, strand = i % 3, ang = t * Math.PI * 9 + (strand === 1 ? Math.PI : 0), y = t * 2.4 - 1.2; if (strand === 2) { const k = rnd(i); a.set([Math.cos(ang) * .45 * (k * 2 - 1), y, Math.sin(ang) * .45 * (k * 2 - 1), .4], i * 4); } else { const j = (rnd2(i) - .5) * .06; a.set([Math.cos(ang) * .45 + j, y, Math.sin(ang) * .45 + j, .6], i * 4); } } return a; },
       galaxy() { const a = new Float32Array(N * 4); for (let i = 0; i < N; i++) { const arm = i % 3, d = Math.pow(rnd(i), .6), ang = arm / 3 * Math.PI * 2 + d * 5.2 + (rnd2(i) - .5) * .5 * (1 - d * .5), sp = (rnd3(i) - .5) * .12 * (1 - d); a.set([Math.cos(ang) * d * 1.2, sp, Math.sin(ang) * d * 1.2, .5], i * 4); } return a; },
       cube() { const a = new Float32Array(N * 4); for (let i = 0; i < N; i++) { const f = i % 6, u = rnd(i) * 2 - 1, v = rnd2(i) * 2 - 1, s = .62, p = f < 2 ? [f ? s : -s, u * s, v * s] : f < 4 ? [u * s, f % 2 ? s : -s, v * s] : [u * s, v * s, f % 2 ? s : -s]; a.set([...p, .5], i * 4); } return a; },
-    };
-    // Portrait : les points sont tirés au sort selon la luminosité et les contours de la photo
-    let portraitData = null;
-    shapes.portrait = () => {
-      const { L, E, w, h } = portraitData, a = new Float32Array(N * 4);
-      let i = 0, guard = 0;
-      while (i < N && guard++ < N * 400) {
-        const x = Math.random() * w, y = Math.random() * h, k = (y | 0) * w + (x | 0);
-        const l = L[k], wgt = l * l * l * 1.8 + 1.3 * Math.min(1, Math.max(0, E[k] - .05) * 6);
-        if (Math.random() * 1.9 > wgt) continue;
-        a.set([(x / w - .5) * (w / h) * 2, (.5 - y / h) * 2, (l - .5) * .7 + (Math.random() - .5) * .04, .1], i++ * 4);
-      }
-      for (; i < N; i++) a.set([0, 0, 0, 0], i * 4);
-      return a;
     };
     const cache = {};
     const shape = name => cache[name] || (cache[name] = shapes[name]());
@@ -271,36 +266,13 @@
     const narrow = () => innerWidth < 900;
     const rectCenter = (el, k) => { const r = el.getBoundingClientRect(); return [r.left + r.width / 2 - innerWidth / 2, innerHeight / 2 - (r.top + r.height / 2), r.height * k]; };
     const stages = [
-      { sel: '.hero', shape: 'portrait', alpha: 1.6, tilt: 0, wave: 0, spin: 0, center: () => frame ? rectCenter(frame, .5) : [0, 0, 0] },
-      { sel: '.hero', shape: 'sphere', start: () => innerHeight * .04, len: () => innerHeight * .45, alpha: 1, tilt: 0, wave: 0, center: () => frame && frame.offsetWidth ? rectCenter(frame, narrow() ? .54 : .6) : [innerWidth * .25, 0, innerHeight * .35] },
+      { sel: '.hero', shape: 'sphere', alpha: 1, tilt: 0, wave: 0, center: () => frame && frame.offsetWidth ? rectCenter(frame, narrow() ? .54 : .6) : [innerWidth * .25, 0, innerHeight * .35] },
       { sel: '#collaborer', shape: 'torus', alpha: .8, tilt: 1.05, wave: 0, center: () => [0, 0, Math.min(innerWidth, innerHeight) * .62] },
       { sel: '#projets', shape: 'plane', alpha: .75, tilt: .32, wave: .16, center: () => [0, -innerHeight * .28, Math.max(innerWidth, innerHeight) * .62] },
       { sel: '#apropos', shape: 'helix', alpha: .9, tilt: .25, wave: 0, center: () => [narrow() ? 0 : -innerWidth * .3, 0, innerHeight * .42] },
       { sel: '#parcours', shape: 'galaxy', alpha: .85, tilt: 1.1, wave: .05, center: () => [narrow() ? 0 : innerWidth * .28, 0, innerHeight * .55] },
       { sel: '#certificats', shape: 'cube', alpha: .9, tilt: .5, wave: 0, center: () => [narrow() ? 0 : innerWidth * .3, innerHeight * .05, innerHeight * .32] },
     ].map(s => ({ ...s, el: document.querySelector(s.sel) })).filter(s => s.el);
-
-    let portraitOn = false, intro = 1;
-    const portraitImg = frame && frame.querySelector('img');
-    if (portraitImg && scrollY < innerHeight * .3) {
-      portraitOn = true; intro = 0;
-      frame.style.opacity = '0';
-      const src = new Image();
-      src.onload = () => {
-        const w = 200, h = Math.round(w * src.naturalHeight / src.naturalWidth);
-        const c = document.createElement('canvas'); c.width = w; c.height = h;
-        const ctx = c.getContext('2d'); ctx.drawImage(src, 0, 0, w, h);
-        const d = ctx.getImageData(0, 0, w, h).data, L = new Float32Array(w * h), E = new Float32Array(w * h);
-        for (let k = 0; k < w * h; k++) L[k] = clamp(((d[k * 4] * .3 + d[k * 4 + 1] * .59 + d[k * 4 + 2] * .11) / 255 - .3) / .55);
-        for (let y = 1; y < h - 1; y++) for (let x = 1; x < w - 1; x++) { const k = y * w + x; E[k] = Math.hypot(L[k + 1] - L[k - 1], L[k + w] - L[k - w]); }
-        portraitData = { L, E, w, h }; cache.portrait = null; pair = [-1, -1];
-        introStart = performance.now();
-      };
-      src.onerror = () => { portraitOn = false; intro = 1; frame.style.opacity = ''; };
-      src.src = portraitImg.currentSrc || portraitImg.src;
-    }
-    let introStart = 0;
-    if (!portraitOn) stages.shift();
 
     let pair = [0, 0], dpr = 1, t0 = performance.now();
     function resize() {
@@ -320,12 +292,6 @@
       canvas,
       render(dt) {
         const vh = innerHeight, Y = scrollY;
-        if (portraitOn && !portraitData) { gl.clear(gl.COLOR_BUFFER_BIT); return; }
-        if (portraitOn) {
-          intro = introStart ? clamp((performance.now() - introStart) / 2600) : 0;
-          // la vraie photo apparaît pendant que le visage en points se disperse
-          frame.style.opacity = clamp((Y - vh * .06) / (vh * .3)).toFixed(3);
-        }
         let a = 0, b = 0, m = 0;
         for (let j = 1; j < stages.length; j++) {
           const st = stages[j];
@@ -351,13 +317,120 @@
         gl.uniform2f(U.uView, innerWidth, innerHeight);
         const yaw = sp => (rot + mouse.sx * .5) * sp + (1 - sp) * mouse.sx * .3;
         gl.uniform1f(U.uYawA, yaw(A.spin ?? 1)); gl.uniform1f(U.uYawB, yaw(B.spin ?? 1));
-        gl.uniform1f(U.uIntro, ease(intro));
+        gl.uniform1f(U.uIntro, 1);
         gl.uniform2f(U.uMouse, mouse.x - innerWidth / 2, innerHeight / 2 - mouse.y);
         gl.uniform3f(U.uCA, ...cA); gl.uniform3f(U.uCB, ...cB);
         gl.drawArrays(gl.POINTS, 0, N);
       },
     };
   })();
+
+  /* ---------- Projets : galerie horizontale épinglée (grands écrans) ---------- */
+  let gallery = null, gx = 0;
+  const wide = () => innerWidth >= 900 && innerHeight >= 560;
+  function setupGallery() {
+    if (gallery) return;
+    const sec = home.querySelector('#projets'), track = sec && sec.querySelector('.projects'), head = sec && sec.querySelector('.section-head');
+    if (!track) return;
+    const pin = document.createElement('div'), sticky = document.createElement('div'), bar = document.createElement('div');
+    pin.className = 'fx-pin'; sticky.className = 'fx-sticky';
+    bar.className = 'fx-gbar'; bar.setAttribute('aria-hidden', 'true');
+    bar.innerHTML = '<span class="fx-gcount">01 / ' + String(track.children.length).padStart(2, '0') + '</span><span class="fx-gline"><i></i></span><span>Faites défiler →</span>';
+    (head || track).before(pin); pin.append(sticky);
+    if (head) sticky.append(head);
+    sticky.append(track, bar);
+    track.classList.add('fx-track');
+    gallery = { sec, pin, sticky, track, bar, count: bar.querySelector('.fx-gcount'), fill: bar.querySelector('i'), dist: 0, n: track.children.length };
+    // au clavier, amener la carte qui reçoit le focus au centre
+    track.addEventListener('focusin', e => {
+      const card = e.target.closest('.project');
+      if (!card || !root.classList.contains('fx-h') || !gallery.dist) return;
+      const pad = parseFloat(getComputedStyle(gallery.sticky).paddingLeft) || 0;
+      const p = clamp((pad + card.offsetLeft + card.offsetWidth / 2 - innerWidth / 2) / gallery.dist);
+      gallery.sticky.scrollLeft = 0;
+      scrollTo({ top: gallery.pin.getBoundingClientRect().top + scrollY + p * gallery.dist, behavior: 'instant' });
+      gx = p * gallery.dist;
+    });
+    layoutGallery();
+    addEventListener('resize', layoutGallery);
+  }
+  function layoutGallery() {
+    if (!gallery) return;
+    const on = wide() && !home.hidden;
+    root.classList.toggle('fx-h', on);
+    if (!on) { gallery.pin.style.height = ''; gallery.track.style.transform = ''; gallery.dist = 0; return; }
+    const pad = parseFloat(getComputedStyle(gallery.sticky).paddingLeft) || 0;
+    gallery.dist = Math.max(0, gallery.track.scrollWidth + pad * 2 - innerWidth);
+    gallery.pin.style.height = (gallery.dist + innerHeight) + 'px';
+  }
+  function frameGallery(k) {
+    if (!gallery || !gallery.dist || !root.classList.contains('fx-h')) return;
+    const p = clamp(-gallery.pin.getBoundingClientRect().top / gallery.dist);
+    gx = lerp(gx, p * gallery.dist, k * .9);
+    gallery.track.style.transform = `translate3d(${(-gx).toFixed(1)}px,0,0)`;
+    const q = gx / gallery.dist;
+    gallery.fill.style.transform = `scaleX(${q.toFixed(4)})`;
+    gallery.count.textContent = String(Math.min(gallery.n, 1 + Math.round(q * (gallery.n - 1)))).padStart(2, '0') + ' / ' + String(gallery.n).padStart(2, '0');
+  }
+
+  /* ---------- Contact : lettres magnétiques ---------- */
+  let magChars = [], magTitle = null;
+  function magnetize(h) {
+    if (!h || h.dataset.fxMag || !fine.matches) return;
+    h.dataset.fxMag = '1'; magTitle = h;
+    h.setAttribute('aria-label', h.textContent.replace(/\s+/g, ' ').trim());
+    const walker = document.createTreeWalker(h, NodeFilter.SHOW_TEXT), nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach(node => {
+      const frag = document.createDocumentFragment();
+      node.textContent.split(/(\s+)/).forEach(part => {
+        if (!part) return;
+        if (/^\s+$/.test(part)) { frag.append(part); return; }
+        const word = document.createElement('span'); word.className = 'fx-word'; word.setAttribute('aria-hidden', 'true');
+        [...part].forEach(c => { const ch = document.createElement('span'); ch.className = 'fx-ch'; ch.textContent = c; word.append(ch); magChars.push({ el: ch, x: 0, y: 0, s: 1, r: 0 }); });
+        frag.append(word);
+      });
+      node.replaceWith(frag);
+    });
+  }
+  function frameMagnet(k) {
+    if (!magTitle) return;
+    const tr = magTitle.getBoundingClientRect();
+    if (tr.bottom < 0 || tr.top > innerHeight) return;
+    const R = Math.max(160, innerWidth * .14);
+    for (const c of magChars) {
+      const r = c.el.getBoundingClientRect();
+      const cx = r.left + r.width / 2 - c.x, cy = r.top + r.height / 2 - c.y;
+      const dx = cx - mouse.x, dy = cy - mouse.y, d = Math.hypot(dx, dy) || 1;
+      let f = clamp(1 - d / R) * mouse.on; f = f * f * (3 - 2 * f);
+      c.x = lerp(c.x, dx / d * f * 22, k * .8); c.y = lerp(c.y, dy / d * f * 22, k * .8);
+      c.s = lerp(c.s, 1 + f * .32, k * .8); c.r = lerp(c.r, dx / d * f * 5, k * .8);
+      c.el.style.transform = `translate(${c.x.toFixed(1)}px,${c.y.toFixed(1)}px) rotate(${c.r.toFixed(1)}deg) scale(${c.s.toFixed(3)})`;
+    }
+  }
+
+  /* ---------- Parcours : la frise se dessine ---------- */
+  let tl = null;
+  function setupTimeline() {
+    if (tl) return;
+    const el = home.querySelector('.timeline');
+    if (!el) return;
+    el.classList.add('fx-tl');
+    const rail = document.createElement('div'); rail.className = 'fx-tl-rail'; rail.setAttribute('aria-hidden', 'true'); rail.innerHTML = '<div class="fx-tl-fill"></div>';
+    el.prepend(rail);
+    const arts = [...el.querySelectorAll(':scope > article')];
+    arts.forEach(a => { const dot = document.createElement('span'); dot.className = 'fx-tl-dot'; dot.setAttribute('aria-hidden', 'true'); a.prepend(dot); });
+    tl = { el, arts, fill: rail.firstElementChild, p: 0 };
+  }
+  function frameTimeline(k) {
+    if (!tl) return;
+    const r = tl.el.getBoundingClientRect();
+    if (r.bottom < -100 || r.top > innerHeight + 100) return;
+    tl.p = lerp(tl.p, clamp((innerHeight * .62 - r.top) / r.height), k * .8);
+    tl.fill.style.transform = `scaleY(${tl.p.toFixed(4)})`;
+    const y = tl.p * r.height;
+    tl.arts.forEach(a => a.classList.toggle('fx-lit', y >= a.offsetTop + 30));
+  }
 
   /* ---------- Transition carte projet -> page projet ---------- */
   let entering = false;
@@ -430,6 +503,7 @@
     vel = lerp(vel, (scrollY - lastY) / Math.max(dt, .001) / 60, k); lastY = scrollY;
     mouse.sx = lerp(mouse.sx, mouse.nx, k * .6); mouse.sy = lerp(mouse.sy, mouse.ny, k * .6);
     mouse.on = lerp(mouse.on, mouse.onT, k);
+    frameGallery(k); frameTimeline(k); frameMagnet(k);
     frameDOM(dt);
     if (gl3d) {
       const show = !home.hidden;
