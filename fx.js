@@ -79,7 +79,7 @@
     scope.querySelectorAll('.resume-card,.certificate-featured,.epitech-collection,.case-quote').forEach(el => register(el, 'depth', { stagger: 0, tilt: false }));
     scope.querySelectorAll('.resume-thumb,.certificate-featured .certificate-thumb').forEach(el => register(el, 'tilt', { tilt: true, max: 14 }));
     const cover = scope.querySelector('.case-cover');
-    if (cover) register(cover, 'cover');
+    if (cover && !entering) register(cover, 'cover');
     const next = scope.querySelector('.next-project h2');
     if (next) register(next, 'next');
     const count = scope.querySelector('.epitech-count');
@@ -194,13 +194,27 @@
       galaxy() { const a = new Float32Array(N * 4); for (let i = 0; i < N; i++) { const arm = i % 3, d = Math.pow(rnd(i), .6), ang = arm / 3 * Math.PI * 2 + d * 5.2 + (rnd2(i) - .5) * .5 * (1 - d * .5), sp = (rnd3(i) - .5) * .12 * (1 - d); a.set([Math.cos(ang) * d * 1.2, sp, Math.sin(ang) * d * 1.2, .5], i * 4); } return a; },
       cube() { const a = new Float32Array(N * 4); for (let i = 0; i < N; i++) { const f = i % 6, u = rnd(i) * 2 - 1, v = rnd2(i) * 2 - 1, s = .62, p = f < 2 ? [f ? s : -s, u * s, v * s] : f < 4 ? [u * s, f % 2 ? s : -s, v * s] : [u * s, v * s, f % 2 ? s : -s]; a.set([...p, .5], i * 4); } return a; },
     };
+    // Portrait : les points sont tirés au sort selon la luminosité et les contours de la photo
+    let portraitData = null;
+    shapes.portrait = () => {
+      const { L, E, w, h } = portraitData, a = new Float32Array(N * 4);
+      let i = 0, guard = 0;
+      while (i < N && guard++ < N * 400) {
+        const x = Math.random() * w, y = Math.random() * h, k = (y | 0) * w + (x | 0);
+        const l = L[k], wgt = l * l * l * 1.8 + 1.3 * Math.min(1, Math.max(0, E[k] - .05) * 6);
+        if (Math.random() * 1.9 > wgt) continue;
+        a.set([(x / w - .5) * (w / h) * 2, (.5 - y / h) * 2, (l - .5) * .7 + (Math.random() - .5) * .04, .1], i++ * 4);
+      }
+      for (; i < N; i++) a.set([0, 0, 0, 0], i * 4);
+      return a;
+    };
     const cache = {};
     const shape = name => cache[name] || (cache[name] = shapes[name]());
 
     const vs = `
       attribute vec4 aA; attribute vec4 aB; attribute vec4 aR;
-      uniform float uMix, uTime, uDpr, uVel, uWaveA, uWaveB, uTiltA, uTiltB, uAlA, uAlB, uMouseOn;
-      uniform vec2 uView, uRot, uMouse; uniform vec3 uCA, uCB;
+      uniform float uMix, uTime, uDpr, uVel, uWaveA, uWaveB, uTiltA, uTiltB, uAlA, uAlB, uMouseOn, uYawA, uYawB, uIntro;
+      uniform vec2 uView, uMouse; uniform vec3 uCA, uCB;
       varying float vA; varying float vC;
       mat3 rx(float a){float c=cos(a),s=sin(a);return mat3(1.,0.,0.,0.,c,s,0.,-s,c);}
       mat3 ry(float a){float c=cos(a),s=sin(a);return mat3(c,0.,-s,0.,1.,0.,s,0.,c);}
@@ -213,12 +227,13 @@
       void main(){
         float t=uTime*.6;
         float m=smoothstep(aR.w*.45,aR.w*.45+.55,uMix);
-        vec3 pa=rx(uTiltA)*live(aA,uWaveA,t);
-        vec3 pb=rx(uTiltB)*live(aB,uWaveB,t);
+        vec3 pa=ry(uYawA)*rx(uTiltA)*live(aA,uWaveA,t);
+        vec3 pb=ry(uYawB)*rx(uTiltB)*live(aB,uWaveB,t);
         vec3 p=mix(pa,pb,m);
         p+=sin(m*3.14159)*(aR.xyz-.5)*.9;
+        float it=smoothstep(aR.w*.55,aR.w*.55+.45,uIntro);
+        p=mix((aR.xyz-.5)*vec3(7.,5.,3.),p,it);
         p*=1.+abs(uVel)*.004*aR.z;
-        p=ry(uRot.x)*rx(uRot.y)*p;
         float persp=3.2/(3.2-p.z);
         vec3 c=mix(uCA,uCB,m);
         vec2 s=c.xy+p.xy*persp*c.z;
@@ -244,7 +259,7 @@
     gl.linkProgram(prog);
     if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { canvas.remove(); return null; }
     gl.useProgram(prog);
-    const U = {}; ['uMix', 'uTime', 'uDpr', 'uVel', 'uWaveA', 'uWaveB', 'uTiltA', 'uTiltB', 'uAlA', 'uAlB', 'uMouseOn', 'uView', 'uRot', 'uMouse', 'uCA', 'uCB'].forEach(n => U[n] = gl.getUniformLocation(prog, n));
+    const U = {}; ['uMix', 'uTime', 'uDpr', 'uVel', 'uWaveA', 'uWaveB', 'uTiltA', 'uTiltB', 'uAlA', 'uAlB', 'uMouseOn', 'uYawA', 'uYawB', 'uIntro', 'uView', 'uRot', 'uMouse', 'uCA', 'uCB'].forEach(n => U[n] = gl.getUniformLocation(prog, n));
     const buf = (data, name, usage) => { const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, data, usage); const loc = gl.getAttribLocation(prog, name); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 4, gl.FLOAT, false, 0, 0); return b; };
     buf(R, 'aR', gl.STATIC_DRAW);
     const bA = buf(shape('sphere'), 'aA', gl.DYNAMIC_DRAW);
@@ -256,13 +271,36 @@
     const narrow = () => innerWidth < 900;
     const rectCenter = (el, k) => { const r = el.getBoundingClientRect(); return [r.left + r.width / 2 - innerWidth / 2, innerHeight / 2 - (r.top + r.height / 2), r.height * k]; };
     const stages = [
-      { sel: '.hero', shape: 'sphere', alpha: 1, tilt: 0, wave: 0, center: () => frame && frame.offsetWidth ? rectCenter(frame, narrow() ? .54 : .6) : [innerWidth * .25, 0, innerHeight * .35] },
+      { sel: '.hero', shape: 'portrait', alpha: 1.6, tilt: 0, wave: 0, spin: 0, center: () => frame ? rectCenter(frame, .5) : [0, 0, 0] },
+      { sel: '.hero', shape: 'sphere', start: () => innerHeight * .04, len: () => innerHeight * .45, alpha: 1, tilt: 0, wave: 0, center: () => frame && frame.offsetWidth ? rectCenter(frame, narrow() ? .54 : .6) : [innerWidth * .25, 0, innerHeight * .35] },
       { sel: '#collaborer', shape: 'torus', alpha: .8, tilt: 1.05, wave: 0, center: () => [0, 0, Math.min(innerWidth, innerHeight) * .62] },
       { sel: '#projets', shape: 'plane', alpha: .75, tilt: .32, wave: .16, center: () => [0, -innerHeight * .28, Math.max(innerWidth, innerHeight) * .62] },
       { sel: '#apropos', shape: 'helix', alpha: .9, tilt: .25, wave: 0, center: () => [narrow() ? 0 : -innerWidth * .3, 0, innerHeight * .42] },
       { sel: '#parcours', shape: 'galaxy', alpha: .85, tilt: 1.1, wave: .05, center: () => [narrow() ? 0 : innerWidth * .28, 0, innerHeight * .55] },
       { sel: '#certificats', shape: 'cube', alpha: .9, tilt: .5, wave: 0, center: () => [narrow() ? 0 : innerWidth * .3, innerHeight * .05, innerHeight * .32] },
     ].map(s => ({ ...s, el: document.querySelector(s.sel) })).filter(s => s.el);
+
+    let portraitOn = false, intro = 1;
+    const portraitImg = frame && frame.querySelector('img');
+    if (portraitImg && scrollY < innerHeight * .3) {
+      portraitOn = true; intro = 0;
+      frame.style.opacity = '0';
+      const src = new Image();
+      src.onload = () => {
+        const w = 200, h = Math.round(w * src.naturalHeight / src.naturalWidth);
+        const c = document.createElement('canvas'); c.width = w; c.height = h;
+        const ctx = c.getContext('2d'); ctx.drawImage(src, 0, 0, w, h);
+        const d = ctx.getImageData(0, 0, w, h).data, L = new Float32Array(w * h), E = new Float32Array(w * h);
+        for (let k = 0; k < w * h; k++) L[k] = clamp(((d[k * 4] * .3 + d[k * 4 + 1] * .59 + d[k * 4 + 2] * .11) / 255 - .3) / .55);
+        for (let y = 1; y < h - 1; y++) for (let x = 1; x < w - 1; x++) { const k = y * w + x; E[k] = Math.hypot(L[k + 1] - L[k - 1], L[k + w] - L[k - w]); }
+        portraitData = { L, E, w, h }; cache.portrait = null; pair = [-1, -1];
+        introStart = performance.now();
+      };
+      src.onerror = () => { portraitOn = false; intro = 1; frame.style.opacity = ''; };
+      src.src = portraitImg.currentSrc || portraitImg.src;
+    }
+    let introStart = 0;
+    if (!portraitOn) stages.shift();
 
     let pair = [0, 0], dpr = 1, t0 = performance.now();
     function resize() {
@@ -281,12 +319,19 @@
     return {
       canvas,
       render(dt) {
-        const vh = innerHeight, P = scrollY + vh / 2;
+        const vh = innerHeight, Y = scrollY;
+        if (portraitOn && !portraitData) { gl.clear(gl.COLOR_BUFFER_BIT); return; }
+        if (portraitOn) {
+          intro = introStart ? clamp((performance.now() - introStart) / 2600) : 0;
+          // la vraie photo apparaît pendant que le visage en points se disperse
+          frame.style.opacity = clamp((Y - vh * .06) / (vh * .3)).toFixed(3);
+        }
         let a = 0, b = 0, m = 0;
         for (let j = 1; j < stages.length; j++) {
-          const top = stages[j].el.getBoundingClientRect().top + scrollY;
-          if (P > top + vh * .45) { a = b = j; continue; }
-          if (P > top - vh * .45) { a = j - 1; b = j; m = (P - (top - vh * .45)) / (vh * .9); }
+          const st = stages[j];
+          const s = st.start ? st.start() : st.el.getBoundingClientRect().top + Y - vh * .95, L = st.len ? st.len() : vh * .9;
+          if (Y > s + L) { a = b = j; continue; }
+          if (Y > s) { a = j - 1; b = j; m = (Y - s) / L; }
           break;
         }
         setPair(a, b);
@@ -304,12 +349,76 @@
         gl.uniform1f(U.uAlA, A.alpha * fade); gl.uniform1f(U.uAlB, B.alpha * fade);
         gl.uniform1f(U.uMouseOn, mouse.on);
         gl.uniform2f(U.uView, innerWidth, innerHeight);
-        gl.uniform2f(U.uRot, rot + mouse.sx * .5, 0);
+        const yaw = sp => (rot + mouse.sx * .5) * sp + (1 - sp) * mouse.sx * .3;
+        gl.uniform1f(U.uYawA, yaw(A.spin ?? 1)); gl.uniform1f(U.uYawB, yaw(B.spin ?? 1));
+        gl.uniform1f(U.uIntro, ease(intro));
         gl.uniform2f(U.uMouse, mouse.x - innerWidth / 2, innerHeight / 2 - mouse.y);
         gl.uniform3f(U.uCA, ...cA); gl.uniform3f(U.uCB, ...cB);
         gl.drawArrays(gl.POINTS, 0, N);
       },
     };
+  })();
+
+  /* ---------- Transition carte projet -> page projet ---------- */
+  let entering = false;
+  const easeIO = 'cubic-bezier(.76,0,.18,1)';
+  const box = r => ({ left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px' });
+  function makeGhost(src, r) {
+    const g = src.cloneNode(true);
+    g.removeAttribute('data-fx'); g.classList.remove('fx-card'); g.classList.add('fx-ghost');
+    g.querySelectorAll('[style]').forEach(n => n.removeAttribute('style'));
+    g.removeAttribute('style');
+    Object.assign(g.style, box(r), { borderRadius: getComputedStyle(src).borderRadius });
+    document.body.append(g);
+    return g;
+  }
+  function playEnter(ghost) {
+    const target = caseView.querySelector('.case-cover .project-visual');
+    if (!target) { ghost?.remove(); root.classList.remove('fx-leaving'); entering = false; return; }
+    const full = { left: 0, top: 0, width: innerWidth, height: innerHeight };
+    if (!ghost) ghost = makeGhost(target, full);
+    target.style.visibility = 'hidden';
+    root.classList.remove('fx-leaving');
+    root.classList.add('fx-entering');
+    requestAnimationFrame(() => {
+      const r = target.getBoundingClientRect();
+      ghost.animate([{ ...box(full), borderRadius: '0px' }, { ...box(r), borderRadius: getComputedStyle(target).borderRadius }],
+        { duration: 1000, delay: 120, easing: easeIO, fill: 'forwards' }).finished.then(() => {
+        target.style.visibility = ''; ghost.remove(); root.classList.remove('fx-entering'); entering = false;
+      });
+    });
+  }
+  document.addEventListener('click', e => {
+    const a = e.target.closest('a.project');
+    if (!a || home.hidden || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    const vis = a.querySelector('.project-visual'), href = a.getAttribute('href') || '';
+    const id = (href.match(/projets?[-/]([a-z0-9-]+)/) || [])[1];
+    if (!vis || !id || !vis.animate) return;
+    e.preventDefault();
+    const ghost = makeGhost(vis, vis.getBoundingClientRect());
+    root.classList.add('fx-leaving');
+    ghost.animate([{ ...box(vis.getBoundingClientRect()), borderRadius: getComputedStyle(vis).borderRadius }, { ...box({ left: 0, top: 0, width: innerWidth, height: innerHeight }), borderRadius: '0px' }],
+      { duration: 850, easing: easeIO, fill: 'forwards' }).finished.then(() => {
+      entering = true;
+      if (href.startsWith('#')) {
+        // aperçu : même document, la page projet s'affiche sans rechargement
+        addEventListener('hashchange', () => requestAnimationFrame(() => { scan(); playEnter(ghost); }), { once: true });
+        location.hash = href;
+      } else {
+        try { sessionStorage.setItem('fx-enter', id); } catch {}
+        location.href = a.href;
+      }
+    });
+  }, true);
+  addEventListener('pageshow', e => {
+    if (!e.persisted) return;
+    document.querySelectorAll('.fx-ghost').forEach(g => g.remove());
+    root.classList.remove('fx-leaving', 'fx-entering');
+  });
+  (() => {
+    let id = null;
+    try { id = sessionStorage.getItem('fx-enter'); sessionStorage.removeItem('fx-enter'); } catch {}
+    if (id && home.hidden && location.pathname.includes('/projets/' + id)) { entering = true; queueMicrotask(() => playEnter(null)); }
   })();
 
   /* ---------- Boucle principale ---------- */

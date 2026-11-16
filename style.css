@@ -167,3 +167,8 @@ dialog[open]::backdrop{animation:backdrop-enter .25s ease-out}
 .fx-in .fx-line-in{transform:none}
 .fx .next-project h2{will-change:transform}
 @media(prefers-reduced-motion:reduce){.fx-canvas{display:none}.fx-line-in{transform:none!important}}
+.fx-ghost{position:fixed!important;z-index:1000;margin:0!important;transform:none!important;opacity:1!important;pointer-events:none;overflow:hidden}
+.fx main,.fx header,.fx footer{transition:opacity .55s ease}
+.fx-leaving main,.fx-leaving header,.fx-leaving footer{opacity:0}
+.fx-entering #case-view .case-hero{animation:fx-rise .9s .35s cubic-bezier(.16,1,.3,1) backwards}
+@keyframes fx-rise{from{opacity:0;transform:translateY(40px)}}
