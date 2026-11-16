@@ -152,3 +152,18 @@ dialog[open]::backdrop{animation:backdrop-enter .25s ease-out}
 
 /* Titres et sections reçoivent le focus par script (accessibilité) : pas de contour visible */
 [tabindex="-1"]:focus{outline:none}
+/* Effets 3D et scroll (fx.js) */
+.fx-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+.fx .ticker>.ticker-track{animation:none;will-change:transform}
+.fx .portrait-frame{box-shadow:var(--fx-sx,12px) var(--fx-sy,-12px) 0 var(--accent);will-change:transform;transform-origin:50% 60%}
+.fx .portrait-frame img{scale:1.08}
+.fx .fx-card,.fx [data-fx]{will-change:transform,opacity;transform-origin:50% 100%}
+.fx [data-fx=tilt]{transform-origin:50% 50%;transition:box-shadow .4s}
+.fx [data-fx=tilt]:hover{box-shadow:0 30px 60px #0008}
+.fx .fx-card::before{content:"";position:absolute;inset:0;z-index:4;pointer-events:none;opacity:0;transition:opacity .4s;background:radial-gradient(circle at var(--fx-gx,50%) var(--fx-gy,50%),#ffffff40,transparent 45%);mix-blend-mode:soft-light}
+.fx .project:hover .fx-card::before{opacity:1}
+.fx-line{display:block;overflow:hidden;padding-bottom:.1em;margin-bottom:-.1em}
+.fx-line-in{display:block;transform:translateY(110%) rotate(5deg);transform-origin:0 100%;transition:transform 1.1s cubic-bezier(.16,1,.3,1) calc(var(--i)*.09s)}
+.fx-in .fx-line-in{transform:none}
+.fx .next-project h2{will-change:transform}
+@media(prefers-reduced-motion:reduce){.fx-canvas{display:none}.fx-line-in{transform:none!important}}
