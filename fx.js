@@ -227,7 +227,7 @@
         s+=normalize(dm+.001)*f*50.;
         gl_Position=vec4(s/(uView*.5),0.,1.);
         gl_PointSize=(1.6+aR.x*2.4+step(.985,aR.y)*5.)*persp*uDpr*(1.+f*.9);
-        vA=mix(uAlA,uAlB,m)*(.45+.75*smoothstep(-1.3,1.,p.z))*(1.-step(.985,aR.y)*.6);
+        vA=.55*mix(uAlA,uAlB,m)*(.45+.75*smoothstep(-1.3,1.,p.z))*(1.-step(.985,aR.y)*.6);
         vC=clamp(aR.y*.8+f+(1.-persp)*-.6,0.,1.);
       }`;
     const fs = `
