@@ -152,3 +152,52 @@ dialog[open]::backdrop{animation:backdrop-enter .25s ease-out}
 
 /* Titres et sections reçoivent le focus par script (accessibilité) : pas de contour visible */
 [tabindex="-1"]:focus{outline:none}
+/* Effets 3D et scroll (fx.js) */
+.fx-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+.fx .ticker>.ticker-track{animation:none;will-change:transform}
+.fx .portrait-frame{box-shadow:var(--fx-sx,12px) var(--fx-sy,-12px) 0 var(--accent);will-change:transform;transform-origin:50% 60%}
+.fx .portrait-frame img{scale:1.08}
+.fx .fx-card,.fx [data-fx]{will-change:transform,opacity;transform-origin:50% 100%}
+.fx [data-fx=tilt]{transform-origin:50% 50%;transition:box-shadow .4s}
+.fx [data-fx=tilt]:hover{box-shadow:0 30px 60px #0008}
+.fx .fx-card::before{content:"";position:absolute;inset:0;z-index:4;pointer-events:none;opacity:0;transition:opacity .4s;background:radial-gradient(circle at var(--fx-gx,50%) var(--fx-gy,50%),#ffffff40,transparent 45%);mix-blend-mode:soft-light}
+.fx .project:hover .fx-card::before{opacity:1}
+.fx-line{display:block;overflow:hidden;padding-bottom:.1em;margin-bottom:-.1em}
+.fx-line-in{display:block;transform:translateY(110%) rotate(5deg);transform-origin:0 100%;transition:transform 1.1s cubic-bezier(.16,1,.3,1) calc(var(--i)*.09s)}
+.fx-in .fx-line-in{transform:none}
+.fx .next-project h2{will-change:transform}
+@media(prefers-reduced-motion:reduce){.fx-canvas{display:none}.fx-line-in{transform:none!important}}
+.fx-ghost{position:fixed!important;z-index:1000;margin:0!important;transform:none!important;opacity:1!important;pointer-events:none;overflow:hidden}
+.fx main,.fx header,.fx footer{transition:opacity .55s ease}
+.fx-leaving main,.fx-leaving header,.fx-leaving footer{opacity:0}
+.fx-entering #case-view .case-hero{animation:fx-rise .9s .35s cubic-bezier(.16,1,.3,1) backwards}
+@keyframes fx-rise{from{opacity:0;transform:translateY(40px)}}
+/* Galerie horizontale épinglée */
+.fx{overflow-x:clip}
+.fx-h #projets{padding-bottom:0;padding-top:60px}
+.fx-h .fx-sticky{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;justify-content:center;gap:clamp(20px,4vh,48px);margin-inline:calc(50% - 50vw);padding-inline:5vw;overflow:hidden}
+.fx-h .fx-sticky .section-head{margin-bottom:0}
+.fx-h .fx-track{display:flex!important;gap:3vw;width:max-content;will-change:transform;align-items:flex-start}
+.fx-h .fx-track .project{flex:none;width:min(36vw,calc((100vh - 330px) * 1.6),600px);height:auto!important}
+.fx-h .fx-track .project:nth-child(even){transform:translateY(4vh)}
+.fx-h .fx-track .project-info{min-height:0}
+.fx-gbar{display:none}
+.fx-h .fx-gbar{display:flex;align-items:center;gap:20px;font-size:12px;letter-spacing:1.4px;color:var(--muted);text-transform:uppercase}
+.fx-gline{flex:1;max-width:360px;height:1px;background:var(--line);position:relative;overflow:hidden}
+.fx-gline i{position:absolute;inset:0;background:var(--accent);transform-origin:left;transform:scaleX(0)}
+.fx-gcount{color:var(--ink);font-variant-numeric:tabular-nums}
+/* Lettres magnétiques */
+.fx-word{display:inline-block;white-space:nowrap}
+.fx-ch{display:inline-block;will-change:transform}
+/* Frise du parcours */
+.fx-tl{position:relative}
+.fx-tl-rail{position:absolute;left:-34px;top:0;bottom:0;width:2px;background:var(--line)}
+.fx-tl-fill{position:absolute;inset:0;background:var(--accent);transform-origin:top;transform:scaleY(0);box-shadow:0 0 14px var(--accent)}
+.fx-tl-dot{position:absolute;left:-40px;top:34px;width:14px;height:14px;border-radius:50%;border:2px solid var(--line);background:var(--bg);transition:background .4s,border-color .4s,box-shadow .4s}
+.fx-tl>article{transition:opacity .6s;opacity:.35}
+.fx-tl>article.fx-lit{opacity:1}
+.fx-tl>article::after{content:"";position:absolute;left:0;top:-1px;height:1px;width:100%;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform 1.1s cubic-bezier(.16,1,.3,1)}
+.fx-tl>article.fx-lit::after{transform:none}
+.fx-tl>article.fx-lit .fx-tl-dot{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 6px #6361ea33}
+@media(max-width:650px){.fx-tl-rail{left:-13px}.fx-tl-dot{left:-18px;width:12px;height:12px}}
+.fx .collaboration-grid{overflow-x:clip;overflow-y:visible}
