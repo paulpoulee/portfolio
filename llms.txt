@@ -1,0 +1,34 @@
+# Paul Balcon — Portfolio
+
+> Paul Balcon est chef de projet digital à Bordeaux (France). Il pilote des projets web et mobiles de l’idée à la mise en ligne, conçoit les interfaces (UX/UI, Product Design) et participe au développement web. Il est disponible pour un poste en équipe et propose aussi la création de sites internet en freelance (artisans, indépendants, associations, particuliers).
+
+## Profil
+
+- Métier : chef de projet digital, Product Designer, développeur web
+- Localisation : Bordeaux, France
+- Formation : Epitech, MSc Business & Technology Manager (RNCP niveau 7, depuis 2022) ; HEC Paris, AI Entrepreneurship Certificate (2026, projet MELO)
+- Expériences : Web Developer chez Catalpa (2025, 2 mois) ; Product Designer chez Sense4Data (2024, 6 mois) ; Product Designer chez Koloc (2023, 2 mois)
+- Compétences : cadrage et gestion de projet, méthodes agiles, UX research, UI design, prototypage, design system, Figma, Webflow, React, SEO
+- Contact : paul.balcon@orange.fr · +33 6 44 35 41 11 · https://www.linkedin.com/in/paul-balcon
+- CV : [Product Designer (PDF)](https://paul-balcon-design.poulepaul.chatgpt.site/assets/cv-product-designer.pdf) · [Chef de projet digital (PDF)](https://paul-balcon-design.poulepaul.chatgpt.site/assets/cv-chef-projet.pdf)
+
+## Projets
+
+- [Relève](https://paul-balcon-design.poulepaul.chatgpt.site/projets/releve/) : Du talent. Du terrain. Du concret. J’ai conçu et développé Relève pour mettre en relation les entreprises du BTP et les intérimaires disponibles en Gironde. Développé sous le nom InteriMatch, ce projet rend la recherche de missions et de profils plus claire. (Format : Plateforme web · POC ; Secteur : Intérim BTP · Gironde ; Réalisation : Paul Balcon ; Période : Septembre 2026)
+- [MELO](https://paul-balcon-design.poulepaul.chatgpt.site/projets/melo/) : Prendre soin du quotidien étudiant. MELO est né à HEC dans le cadre du certificat AI Entrepreneurship : six semaines pour lancer un projet de startup. Notre équipe a obtenu le certificat à l’issue de la présentation du projet devant un jury d’investisseurs. (Programme : HEC · AI Entrepreneurship ; Durée : 6 semaines · Projet de startup ; Mon rôle : UX/UI Design & Front-end ; Aboutissement : Certificat obtenu · Jury d’investisseurs)
+- [NeoTravel](https://paul-balcon-design.poulepaul.chatgpt.site/projets/neotravel/) : Automatiser la demande. Préserver le conseil. Digitaliser la chaîne commerciale du transport de groupe, pour rendre du temps aux équipes et accélérer le traitement des demandes. (Contexte : Équipe 23 · Campus Bordeaux ; Format : Projet collectif · MVP ; Expérience : Site & dashboard ; Périmètre : Demande → qualification → devis)
+- [Pik-It](https://paul-balcon-design.poulepaul.chatgpt.site/projets/pikit/) : Explorer. Capturer. Se challenger. Un projet d’application mobile sociale qui transforme la collecte de photos en défis, pour contribuer à l’entraînement d’une IA spatiale. (Format : Application mobile ; Contribution : Design & pilotage ; Outils : Figma · Design System ; Démarche : Recherche → prototype → tests)
+- [Nutrifast](https://paul-balcon-design.poulepaul.chatgpt.site/projets/nutrifast/) : Planifier ses menus. Simplifier ses courses. Une application pour générer ses menus de la semaine, préparer ses courses et suivre sa nutrition au même endroit. (Format : Application mobile ; Univers : Alimentation ; Parcours : Menus → courses → suivi ; Livrable : Maquettes UX/UI)
+- [Menuiserie Manach](https://paul-balcon-design.poulepaul.chatgpt.site/projets/manach/) : Une vitrine pour le savoir-faire artisanal. Un site vitrine pour un artisan menuisier, pensé pour présenter ses meubles, cuisines et aménagements et faciliter la prise de contact. (Contexte : Stage chez Catalpa ; Période : Juin — juillet 2025 ; Outil : Shop Application ; Format : Site vitrine)
+- [Tisseurs d’histoires](https://paul-balcon-design.poulepaul.chatgpt.site/projets/web/) : Donner une scène aux histoires. Un site pour une association de théâtre liée à la culture bretonne, réalisé pendant mon stage chez Catalpa. (Client : Tisseurs d’histoires ; Agence : Catalpa · Plouguerneau ; Période : Juin — juillet 2025 ; Réalisation : Site vitrine · Webflow)
+- [OAK](https://paul-balcon-design.poulepaul.chatgpt.site/projets/oak/) : Accompagner les parcours collaborateurs. Une plateforme RH qui réunit profil collaborateur, formations, opportunités et suivi des entretiens. (Contexte : Sense4Data ; Domaine : Ressources humaines ; Format : Plateforme web ; Rôle : Product Designer)
+- [Biodiv](https://paul-balcon-design.poulepaul.chatgpt.site/projets/biodiv/) : Des données écologiques sur mesure. Une plateforme pour aider les écologues à réunir les données sur la faune et la flore, puis générer un CSV adapté à leur étude. (Contexte : Sense4Data ; Public : Écologues ; Format : Plateforme web ; Sortie : Export CSV personnalisé)
+- [Le Cartable Numérique](https://paul-balcon-design.poulepaul.chatgpt.site/projets/cartable-numerique/) : Un cartable sur tablette pour les élèves au Sénégal. Une application éducative conçue pour une association au Sénégal qui fournit des tablettes aux élèves : un cartable numérique pour retrouver les ressources de leurs cours. (Contexte : Association au Sénégal ; Public : Élèves équipés de tablettes ; Univers : Éducation ; Réalisation : UX/UI · Sense4Data)
+- [Bye Buy Car](https://paul-balcon-design.poulepaul.chatgpt.site/projets/bye-buy-car/) : Acheter et vendre des véhicules entre garages. Une application d’achat et de vente de véhicules d’occasion destinée aux garages, pour consulter les offres, publier son stock et entrer en contact. (Contexte : Sense4Data ; Public : Garages automobiles ; Marché : Véhicules d’occasion · B2B ; Format : Application mobile)
+- [KoloK](https://paul-balcon-design.poulepaul.chatgpt.site/projets/kolok/) : Un même toit. Un quotidien mieux organisé. Une application de gestion de la vie en colocation pour coordonner les repas, partager les dépenses et organiser les tâches du quotidien. (Public : Colocataires ; Format : Application ; Univers : Vie quotidienne ; Périmètre : Repas · Dépenses · Organisation)
+- [Village](https://paul-balcon-design.poulepaul.chatgpt.site/projets/village/) : La vie du village, entre sport et découvertes. Une application destinée aux athlètes des Jeux olympiques de Paris 2024 pour découvrir les lieux et services du village et faciliter leurs réservations sportives et culturelles. (Public : Athlètes ; Contexte : Jeux de Paris 2024 ; Format : Application mobile ; Périmètre : Village · Sports · Loisirs)
+
+## Pages
+
+- [Accueil](https://paul-balcon-design.poulepaul.chatgpt.site/) : présentation, projets, parcours, CV, certificats et contact
+- [Mentions légales](https://paul-balcon-design.poulepaul.chatgpt.site/mentions-legales/)
